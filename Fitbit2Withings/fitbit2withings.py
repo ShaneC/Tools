@@ -60,7 +60,6 @@ if __name__ == '__main__':
     fileCount = 1
     while len(entries) > 0:
         with open("WithingsImportCSVs/record_" + str(fileCount) + ".csv", "w", newline='') as csvfile:
-
             
             writer = csv.writer(csvfile)
             writer.writerow(["Date","Weight","Fat mass"])
