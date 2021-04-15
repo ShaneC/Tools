@@ -45,8 +45,7 @@ while True:
         "4. Purge all artifacts\n" +
         "5. Exit\n"
     )
-
-    #print(": " )
+    
     choice = input(f": " )
 
     print("\n")
