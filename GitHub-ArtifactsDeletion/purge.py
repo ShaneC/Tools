@@ -3,7 +3,7 @@ import json
 
 # https://docs.github.com/en/rest/reference/actions#artifacts
 
-GITHUB_REPO = "https://api.github.com/repos/ShaneC/sc-web"
+GITHUB_REPO = "https://api.github.com/repos/[owner]/[repo]}"
 GITHUB_USER = "{GITHUB USERNAME HERE}"
 GITHUB_TOKEN = "{GITHUB TOKEN WITH WORKFLOW PERMISSIONS HERE}"
 
