@@ -1,0 +1,204 @@
+<?php
+ /*
+ * General Website Framework
+ * @requires PHP >= 5.2
+ * @homepage http://shanechism.com
+ *
+ * Copyright (c) Shane Chism <schism@acm.org> 2011
+ * \ Reproduction and distribution prohibited
+ * \ Modification permitted as needed for licensed website
+ */
+
+if( !defined( "RUNTIME" ) ){
+	print( "<b>Error:</b> Invalid file access.<br />Improper runtime environment." );
+	exit();
+}
+
+/** Screen Global Configurables */
+define( "ALWAYS_LOAD_FACEBOX", false );
+
+/** Facebox Configurables */
+define( "FACEBOX_DEFAULT_STYLE", "generic" );
+
+/** \brief Template implementation class.
+ *  @author Shane Chism 
+ */
+class Screen {
+	
+	/** Stores whether or not the Facebox plugin has been loaded (prevents duplication) */
+	private $faceboxLoaded = false;
+	
+	/** Stores defaults set through class methods **/
+	private $defaults;
+	
+	/**
+	 * Initialize the screen class and perform any necessary global options
+	 * @returns Pointer to class object
+	 */
+	public function __construct(){
+		global $db;
+		if( ALWAYS_LOAD_FACEBOX )
+			$this->loadFacebox();
+	}
+	
+	/** Selects template files, outputs them to the screen, and terminates the application.
+	 *  @param file string containing the path/name of the template file (i.e. master/myFile.tpl)
+	 *  @param title OPTIONAL string containing the page title
+	 *  @param noOverall OPTIONAL boolean specifying whether this uses overall headers or not
+	 *  @param header OPTIONAL string containing a header file to overwrite the master header
+	 *  @param footer OPTIONAL string containing a footer file to overwrite the master footer
+	 */
+	public function show( $file, $title = NULL, $options = array() ){
+		global $output, $sys, $_SAction;
+		
+		$output['page']['js'] = ( !isset( $output['page']['js'] ) ) ? '<!-- NONE -->' : $output['page']['js'];
+		$output['page']['css'] = ( !isset( $output['page']['css'] ) ) ? '<!-- NONE -->' : $output['page']['css'];
+		
+		if( !isset( $output['page']['js-script'] ) )
+			$output['page']['js-script'] = '<!-- NONE -->';
+		else{
+			$output['page']['js-script'] =	'<script type="text/javascript">' . "\n\t\t" . 
+												'$(document).ready( function() {' . 
+												 $output['page']['js-script'] . "\n\t\t" . 
+												'});' . "\n\t" . 
+											'</script>';
+		}
+		
+		$output['page']['js-script'] = ( !isset( $output['page']['js-script'] ) ) ? '<!-- NONE -->' : $output['page']['js-script'];
+		
+		$noOverall = ( isset( $options['no_overall'] ) ) ? $options['no_overall'] : false;
+		$header = ( isset( $options['header'] ) ) ? $options['header'] : NULL;
+		$footer = ( isset( $options['footer'] ) ) ? $options['footer'] : NULL;
+		
+		if( !$noOverall ){
+			$header = ( $header === NULL ) ? '/overall_header.tpl' : $header;
+			$footer = ( $footer === NULL ) ? '/overall_footer.tpl' : $footer;
+		}
+		
+		# Load title from configuration menu
+		$siteTitle = $sys['site']['title'];
+		
+		$output['page']['title'] = ( $title === NULL ) ? $siteTitle : $title . " | " . $siteTitle;
+		
+		$filePath = ( isset( $options['style_path'] ) ) ? PS . $options['style_path'] : PS . '/style/';
+		
+		if( !$noOverall )
+			require( PS . '/style/' . $sys['style']['directory'] . $header );
+		require( $filePath . $file );
+		if( !$noOverall )
+			require( PS . '/style/' . $sys['style']['directory'] . $footer );
+			
+		$_SAction->fire( "EVT_SUCCESSFUL_TERMINATION" );
+		exit();
+	}
+	
+	/** Outputs to screen based on pre-set default parameters
+	 *  @param defaultName string containing the name of the default created using registerDefault
+	 *  @param file string containing the path/name of the template file (i.e. master/myFile.tpl)
+	 *  @param title OPTIONAL string containing the page title
+	 */
+	public function showDefault( $defaultName, $file, $title = NULL, $options = array() ){
+		if( !isset( $this->defaults[$defaultName] ) )
+			throw new Exception( "No default has been added with the name of {$defaultName}." );
+		
+		$temp = $this->defaults[$defaultName]['options'];
+		$options = array_merge( $temp, $options );
+		
+		$this->show( $file, $title, $options );
+	}
+	
+	/** Add a non-standard Javascript file to the template file.
+	 *  @param file string containing the path/name of the javascript file relative to the js dir (i.e. myScript.js)
+	 */
+	public function addJS( $file, $options = array() ){
+		global $output;
+		$output['page']['js'] = ( !isset( $output['page']['js'] ) ) ? '' : $output['page']['js'];
+		$jsDir = ( isset( $options['js_dir'] ) ) ? $options['js_dir'] : "/includes/js/";
+		$output['page']['js'] .= "<script src='" . HTTP_ROOT . $jsDir . $file . "' type='text/javascript'></script>\n\t";
+	}
+	
+	/** Add a non-standard CSS file to the template file.
+	 *  @param file string containing the path/name of the css file relative to the style dir (i.e. master/css/buttons.css)
+	 *  @param relativeDir optional string. if set the $file var will become relative to the value of this variable
+	 */
+	public function addCSS( $file, $relativeDir = NULL ){
+		global $output;
+		$output['page']['css'] = ( !isset( $output['page']['css'] ) ) ? '' : $output['page']['css'];
+		if( $relativeDir !== NULL )
+			$output['page']['css'] .= "<link rel=\"stylesheet\" type=\"text/css\" href=\"" . HTTP_ROOT . "/" . $relativeDir . "/" . $file . "\"/>\n\t";
+		else
+			$output['page']['css'] .= "<link rel=\"stylesheet\" type=\"text/css\" href=\"" . HTTP_ROOT . "/style/" . $file . "\"/>\n\t";
+	}
+	
+	/** Add a block of JavaScript to the page header
+	 *  @param script string containing the JavaScript code to include
+	 */
+	public function addJSScript( $script ){
+		global $output;
+		$output['page']['js-script'] = ( !isset( $output['page']['js-script'] ) ) ? '' : $output['page']['js-script'];
+		$output['page']['js-script'] .= "\n\t\t\t" . $script;
+	}
+	
+	/** Adds a dynamically loaded CSS file
+	 *  @param loadCode string containing the Load Code for the file to be included
+	 */
+	public function addDynamicCSS( $loadCode ){
+		global $output;
+		$src = HTTP_ROOT . "/" . ( ( REWRITE_ON ) ? ( "dynamic_load/" . $this->styleID . "/" . $loadCode ) : ( "?p=dynamic_load&style_id=" . $this->styleID . "&target=" . $loadCode ) );
+		$output['page']['css'] = ( !isset( $output['page']['css'] ) ) ? '' : $output['page']['css'];
+		$output['page']['css'] .= "<link rel=\"stylesheet\" type=\"text/css\" href=\"" . $src . "\"/>\n\t";
+	}
+	
+	/** Adds a dynamically loaded javascript file
+	 *  @param loadCode string containing the Load Code for the file to be included
+	 */
+	public function addDynamicJS( $loadCode ){
+		global $output;
+		$output['page']['js'] = ( !isset( $output['page']['js'] ) ) ? '' : $output['page']['js'];
+		$src = HTTP_ROOT . "/" . ( ( REWRITE_ON ) ? ( "dynamic_load/" . $this->styleID . "/" . $loadCode ) : ( "?p=dynamic_load&style_id=" . $this->styleID . "&target=" . $loadCode ) );
+		$output['page']['js'] .= "<script src='" . $src . "' type='text/javascript'></script>\n\t";
+	}
+	
+	/** 
+	 * Attaches files needed for use of the Facebox jQuery plugin
+	 * @param style string specifying the facebox style
+	 * @returns Adds to the Screen the Facebox files
+	 */
+	public function loadFacebox( $style = FACEBOX_DEFAULT_STYLE ){
+		if( $this->faceboxLoaded )
+			return;
+		if( !is_dir( PS . "/includes/js/plugins/jquery.facebox/styles/" . $style ) )
+			throw new Exception( "Invalid Facebox style option specified." );
+		if( !file_exists( PS . "/includes/js/plugins/jquery.facebox/styles/" . $style . "/jquery-facebox.css" ) )
+			throw new Exception( "Unable to load Facebox style resources." );
+		$this->addJS( "plugins/jquery.facebox/jquery-facebox.js" );
+		$this->addCSS( "js/plugins/jquery.facebox/styles/" . $style . "/jquery-facebox.css", "includes" );
+		$this->addJSScript(	"$('a[rel*=facebox]').facebox({\n" . 
+								"\t\t\t\tloadingImage : '/includes/js/plugins/jquery.facebox/styles/" . $style . "/images/loading.gif',\n" . 
+								"\t\t\t\tcloseImage : '/includes/js/plugins/jquery.facebox/styles/" . $style . "/images/closelabel.png'\n" . 
+							"\t\t\t});" );
+		$this->faceboxLoaded = true;
+	}
+	
+	/** 
+	 * Stores parameters for use during the current session
+	 *  @param noOverall OPTIONAL boolean specifying whether this uses overall headers or not
+	 *  @param header OPTIONAL string containing a header file to overwrite the master header
+	 *  @param footer OPTIONAL string containing a footer file to overwrite the master footer
+	 */
+	public function registerDefault( $name, $options = array() ){
+		if( !isset( $this->defaults ) )
+			$this->defaults = array();
+		try {
+			if( isset( $this->defaults[$name] ) )
+				throw new SysException( "The Screen Default of name {$name} already exists." );
+		}catch( SysException $e ){
+			$e->show( $e->getMessage() );	
+		}
+		
+		$this->defaults[$name]['options'] = $options;
+	}
+	
+}
+
+?>

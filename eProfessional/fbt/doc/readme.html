@@ -1,0 +1,112 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Facebook Tagger : README | Developed by S. Chism</title>
+    
+    <style type="text/css">
+		span.code {
+			font-family: "Courier New", Courier, Times New Roman;
+			font-size: 12px;
+		}
+	</style>
+</head>
+
+<body>
+
+	<h2>Facebook Tagger Documentation (FBT v1.1.0)</h2>
+    
+    <b>CONTENTS:</b>
+    <ul>
+    	<li><a href="#license">License</a></li>
+        <li><a href="#requirements">Installation Requirements</a></li>
+        <li><a href="#notes">Notes</a></li>
+        <li><a href="#implementation">Implementation</a></li>
+        <li><a href="#resources">Additional References &amp; Resources</a></li>
+    </ul>
+    
+    <hr />
+    
+    <a name="license" />
+    <b>LICENSE:</b><br /><br />
+    Copyright (&copy;) 2009 Shane Chism.<br />
+    <a href="http://www.xt-arts.com/">http://www.xt-arts.com/</a><br /><br />
+    <i>This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the  GNU General Public License for more details.</i><br />
+	
+    <hr /><br />
+    
+    <a name="requirements" />
+    <b>INSTALLATION REQUIREMENTS:</b><br />
+	<ul>
+    	<li>PHP 4.0.6 or higher (PHP >= 5.1.X highly recommended)</li>
+        <li>Upload access enabled in the PHP.INI or PHP Config (<b><span class="code">file_uploads</span></b> set to <i><span class="code">"on"</span></i>)</li>
+        <li>Intermediate PHP and HTML knowledge</li>
+    </ul>
+        
+    <hr /><br />
+    
+    <a name="notes" />
+    <b>NOTES:</b><br />
+    <ul>
+    	<li>The maximum dimensions of a Facebook profile picture are <b>200px wide</b> by <b>600px high</b></li>
+        <li>It is <b>HIGHLY</b> recommended that, if you choose to use an overlay, you make your overlay image <b>exactly 200px wide</b></li>
+        <li>For best result use a high quality overlay image with 300 DPI and maximum saved resolution</li>
+    </ul>
+    
+    <hr /><br />
+    
+    <a name="implementation" />
+    <b>IMPLEMENTATION:</b><br />
+    
+    <ul>
+    	<li>Before the tagger can be invoked you must include the function file, by default called <span class="code">facebook_tagger.php</span>
+    	<li>To invoke the tagger you will need to call the <span class="code">fbtTagger();</span> function</li>
+        <li>Function Paramaters <i><span class="code">fbtTagger( $uploadedImage, $goForIt );</span></i>
+        	<li><b><span class="code">$uploadedImage</span></b> - Variable containing the uploaded image (ie: <span class="code">$_FILES['myUploadFieldName']</span> )</li>
+            <li><b><span class="code">$goForIt</span></b> - Boolean (<span class="code">true</span> or <span class="code">false</span>); True will render and display the image, false will simply check to ensure the image is a valid one</li>
+        </li>
+    </ul>
+    
+    <p><b><u>Return Values</u>:</b></p>
+    
+    If <span class="code">$goForIt</span> is set to <span class="code">true</span>:
+    <ul>
+    	<li>Returns <span class="code">true</span> : Image has been succesfully rendered</li>
+        <li>Returns <span class="code">false</span> : An error has occured</li>
+    </ul>
+    
+    If <span class="code">$goForIt</span> is set to <span class="code">false</span>:
+    <ul>
+    	<li>Returns <span class="code">true</span> : Image is present and the proper format</li>
+        <li>Returns <span class="code">false</span> : Image is not a valid resource</li>
+    </ul>
+    
+    Both Conditions:
+    <ul>
+    	<li>Returns <span class="code">$$fbtTextReturn (user set in function config)</span> : Text reflecting the success or failure of the function</li>
+        <li>Returns <span class="code">$$fbtImageReturn (user set in function config)</span> : Returns local URL of the image if image generation was a success</li>
+    </ul>
+    
+    <p><b><u>Sample Implementation</u>:</b></p>
+    
+    You can view a complete sample implementation, including script and template pages, in <a href="samples/uploader.php">docs/samples/</a>.<br /><br />
+    
+    <hr /><br />
+    
+    <a name="resources" />
+    <b>ADDITIONAL REFERENCES &amp; RESOURCES:</b><br />
+    
+    <ul>
+    	<li><a href="http://www.php.net">PHP.net</a> - Great PHP resource and information source</li>
+        <li><a href="http://www.washington.edu/computing/web/publishing/php-ini.html">Using a php.ini file, tutorial</a> - How to read and use a PHP.INI file</li>
+        <li><a href="http://www.allfacebook.com/2009/02/facebook-profile-photo-hacks/">5 Creative Ways to Hack Your Facebook Profile Photo</a> - Helpful guide on creating good overlays</li>
+        <li><a href="http://us.php.net/manual/en/language.variables.variable.php">PHP.net Variable variables</a> - Explanation of variable variables (ie. $$variableName )</li>
+    </ul>
+    
+    <hr /><br />
+    
+</body>
+
+</html>

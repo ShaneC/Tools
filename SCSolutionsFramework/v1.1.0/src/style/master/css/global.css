@@ -1,0 +1,22 @@
+@charset "utf-8";
+/*
+ * CSS - Website Style
+ * [Author]
+ * Shane Chism <schism@acm.org>
+ * http://shanechism.com
+ */
+
+/* ---------------------------------------------------------------- 
+ *  GENERAL LAYOUT
+ * ----------------------------------------------------------------
+*/
+
+*,html {
+	margin: 0px; padding: 0px;	
+}
+
+body {
+	padding: 20px;
+	background-color: #ffffff; color: #000000;
+	font-family: Arial, Helvetica, sans-serif; font-size: 12px;
+}

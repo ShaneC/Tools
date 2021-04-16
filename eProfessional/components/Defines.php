@@ -1,0 +1,5 @@
+<?php
+
+# Universal installation definitions
+
+?>

@@ -1,0 +1,43 @@
+# Custom error documents
+ErrorDocument 403 /index.php?p=403
+ErrorDocument 404 /index.php?p=404
+
+# Deny core includes, sensitive files, and logs
+<Files ~ "^\.htaccess">
+Order allow,deny
+Deny from all
+</Files>
+<Files ~ "\.tpl$">
+Order allow,deny
+Deny from all
+</Files>
+<Files ~ "\.deny$">
+Order allow,deny
+Deny from all
+</Files>
+<Files ~ "\.log$">
+Order allow,deny
+Deny from all
+</Files>
+<Files ~ "\.cfg$">
+Order allow,deny
+Deny from all
+</Files>
+
+RewriteEngine On
+RewriteBase /
+
+#----Begin Mod_Rewrite----
+
+# System Modules
+RewriteRule ^dynamic_load/([0-9]+)/(.*)$ index.php?p=dynamic_load&style_id=$1&target=$2 [L,QSA]
+
+# Reserved Directories
+RewriteRule ^includes/.*$ - [PT]
+RewriteRule ^logic/.*$ - [PT]
+RewriteRule ^style/.*$ - [PT]
+
+#----End Mod_Rewrite----
+
+# Custom PHP parsing types
+AddType application/x-httpd-php .php .cfg .tpl
